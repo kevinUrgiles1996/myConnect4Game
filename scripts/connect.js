@@ -1,6 +1,7 @@
 class Connect4 {
 
   constructor(selector) {
+    this.isGameOver = 'false';
     this.selector = selector;
     this.player = 'red';
     this.ROWS = 6;
@@ -12,6 +13,10 @@ class Connect4 {
   createGrid() {
 
     const $board = $(this.selector);
+
+    $board.empty(); //This removes the html inside $board
+    this.player = 'red';
+    this.isGameOver = 'false';
 
     for (let row = 0; row < this.ROWS; row++) {
       const $row = $('<div>').addClass('row');
@@ -30,6 +35,11 @@ class Connect4 {
 
     const $board = $(this.selector);
     const that = this;
+
+    function playSound(){
+      var audio = new Audio('sounds/turn.mp3');
+      audio.play();
+    }
 
     function findLastEmptyCell(col){
       const cells = $(`.col[data-col=${col}]`);
@@ -62,14 +72,24 @@ class Connect4 {
       lastEmptyCell.addClass(that.player);
       lastEmptyCell.data('player', that.player); //(3)
 
+      playSound();
+
       //New (1)
       const winner = that.checkForWinner(
         lastEmptyCell.data('row'),
         lastEmptyCell.data('col'));
 
       if(winner){
-        alert(`Game Over! ${that.player} has won`); //New (2)
+
+        this.isGameOver = 'true';
+
+        Swal.fire(
+            'game over!',
+            `${that.player} has won`
+        );
+
         $('.col.empty').removeClass('empty'); // To avoid continue playing the game
+
         return;
       }
 
@@ -141,6 +161,10 @@ class Connect4 {
            checkHorizontals() ||
            checkPositiveDiagonal() ||
            checkNegativeDiagonal();
+  }
+
+  restart(){
+    this.createGrid();
   }
 
 
